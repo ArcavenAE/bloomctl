@@ -6,6 +6,9 @@ permissions:
 
 jobs:
   dependency-review:
+    # Dependency-review API requires GHAS on private repositories; guard
+    # keeps this green while private and self-activates on visibility flip.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner
