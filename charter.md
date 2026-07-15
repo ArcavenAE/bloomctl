@@ -5,9 +5,10 @@
 > present but does not persist. Follows the kos process:
 > Orient → Ideate → Question → Probe → Harvest → Promote.
 
-Last updated: 2026-07-15 (scaffold session — repo created by porting the
-sidestep pattern wholesale; 147 tests green at the fmt/clippy/deny gates;
-live validation blocked on token permissions, bd aae-orc-b6dg.11)
+Last updated: 2026-07-15 (scaffold session, same-day follow-up — live
+validation PASSED after the user granted token permissions (F1 → B8);
+repo public; signing enabled (release environment + 7 org secrets +
+SIGNING_ENABLED=true))
 
 ---
 
@@ -169,6 +170,35 @@ Verified live 2026-07-15: server `kandji-mcp` v3.4.4, 131 tools,
 SSE-framed JSON-RPC responses. Tool *calls* were permission-blocked
 (see F1) but transport, handshake, and tools/list are confirmed real.
 
+### B8: Live-Validated Against the Production Tenant
+
+Same-day follow-up to the scaffold, after the user granted the token
+read permissions. Auth mechanism first verified by differential probe
+(garbage token → 401, no header → 401, real token → 403), confirming
+the token IS the bearer — no exchange step exists. Then the smoke:
+
+- `api get_settings_licensing` — real payload (counts/limits).
+- `list` live for device, blueprint, user, tag, audit_event,
+  vulnerability, custom_app, custom_profile, custom_script,
+  ade_device. **Every kind-table field guess confirmed** — device_id/
+  device_name/last_check_in/platform/blueprint_id, blueprint id+name+
+  enrollment_code+computers_count, audit_event id/action/occurred_at,
+  vulnerability cve_id/severity/first_detection_date, library-item
+  id/name. threat + behavioral_detection 403 (permission not granted
+  or SKU-gated) — the only unverified pair (F2).
+- Live pipeline: `list device | filter --where 'platform == "Mac" &&
+  os_version.startsWith("15.")' | emit --format md` — CEL promotion
+  and the stream contract work on real payloads.
+- MCP end-to-end: `mcp status`, `mcp tools --filter`, `mcp call
+  get-settings-licensing` (connector `outcome: success`), write-guard
+  refuses `create-tag` without opt-in, `mcp map` links 35/131 tools to
+  operationIds (the 96 unmatched are curated names — F3 mining data).
+- Audit trail flowing: 37 JSONL lines day one at `~/.bloomctl/audit/`
+  (macOS falls back to `~/.bloomctl` — `dirs::state_dir()` is None on
+  macOS; XDG state path applies on Linux).
+
+Evidence: bd aae-orc-b6dg.11 (closed); orc finding-077 addendum.
+
 ### B7: v0.1 Primitive Layer (Ported)
 
 Six primitives (`list`, `get`, `search`, `filter`, `enrich`, `emit`) +
@@ -192,24 +222,17 @@ Kind-table field metadata (id/timestamp/search fields) is
 
 *Actively open. Expected to resolve through design work or probes.*
 
-### F1: Live Validation [BLOCKED on token permissions]
+### F1: Live Validation [RESOLVED → B8]
 
-Every REST endpoint and every MCP tool call returned 403 "You do not
-have permission to perform this action" at scaffold time — the token
-has no API permissions granted. Once read permissions are enabled
-(iru Access → API token → Manage API Permissions), run the smoke
-sequence: `bloomctl api get_settings_licensing`, `bloomctl list
-device --limit 1`, `bloomctl mcp call get-settings-licensing`, then
-correct the kind table's field guesses against real payloads.
-bd: aae-orc-b6dg.11.
+User granted read permissions same day; full smoke passed. See B8.
 
-### F2: Response-Shape Knowledge Gap
+### F2: Response-Shape Knowledge Gap [largely resolved]
 
-The iru spec declares almost no response schemas (resp properties are
-empty for most 200s). The kind table's `id_field` /
-`primary_timestamp_field` / `search_field` values came from vendor
-docs, not the spec. After F1 unblocks, an audit-trail pass over
-`shape_hash` clusters is the cheap way to confirm or fix them.
+Field metadata confirmed against live payloads for 10 of 12 kinds
+(see B8) — no kind-table changes were needed. Remaining: `threat`
+and `behavioral_detection` field guesses are unverified (their
+endpoints 403 — the threat/EDR permission wasn't in the grant, or
+the tenant SKU lacks it). Re-verify when that permission lands.
 
 ### F3: Audit-Trail Mining → v0.2 Composite Verbs
 
