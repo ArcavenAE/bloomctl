@@ -1,6 +1,8 @@
 pre-commit:
   parallel: true
   commands:
+    tenant-leaks:
+      run: scripts/check-tenant-leaks.sh --staged
     fmt:
       run: cargo +nightly fmt --all -- --check
     clippy:

@@ -5,6 +5,14 @@ vendored OpenAPI spec, audit-trail-as-feature, agent-first ergonomics,
 read-only against the live tenant by default. Backed by an SDK that
 also operates iru's published MCP server as a client.
 
+> **⚠ Tenant data hygiene (load-bearing).** bloomctl operates a live
+> MDM fleet. NEVER put PII, device-identifying info (serials, UDIDs,
+> names, hostnames), fleet vulnerability details, credentials/secrets
+> (tokens, MCP keys, FileVault keys, bypass codes, PINs), unmasked
+> tenant/company identity, or raw audit-trail lines into git commits,
+> `gh` issues/PRs, discussions, or any shared log. Sanitize first.
+> Full rule: `.claude/rules/tenant-data-hygiene.md`.
+
 @charter.md
 @.claude/rules/_index.md
 

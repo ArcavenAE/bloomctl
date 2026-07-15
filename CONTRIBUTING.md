@@ -16,6 +16,34 @@ just check           # mirror CI quality gates locally
 - Open a PR; CI runs fmt, clippy, build, test, cargo-deny, and dependency
   review.
 
+## Sharing logs, payloads, and repros (read before filing issues)
+
+bloomctl runs against live MDM tenants. Anything the tool prints can
+identify a real fleet. Before sharing output in an issue, PR, or
+commit:
+
+1. **Prefer shapes over values.** Share `bloomctl ops show <id>`,
+   exit codes, and error text — not payloads. For response-shape
+   questions, share the audit line's `shape_hash` fields, never the
+   records.
+2. **Reproduce against wiremock or fixtures** where possible
+   (`BLOOMCTL_BASE_URL` + `examples/fixtures/`) — repros built on
+   synthetic data are directly committable as failing tests.
+3. **If real output is unavoidable, sanitize it**: replace the
+   subdomain with `your-subdomain`; device ids/UDIDs with
+   `00000000-0000-0000-0000-000000000000`; serials with
+   `C02XXXXXXXXX`; names/emails with `example` values; delete
+   pagination `next` URLs.
+4. **Run repros with `BLOOMCTL_AUDIT=off`** if you plan to share your
+   terminal transcript, and never share raw audit-trail lines.
+5. **Never share secrets-endpoint output** (FileVault keys, bypass
+   codes, PINs) in any form, redacted or not.
+
+The pre-commit hook (`scripts/check-tenant-leaks.sh`) blocks
+tenant-shaped hostnames and key material; add your tenant's literals
+to `.leak-patterns.local` (gitignored) so it also catches your
+subdomain, org name, and serial prefixes.
+
 ## Spec changes
 
 If the iru OpenAPI spec changes upstream:

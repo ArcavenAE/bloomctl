@@ -1,5 +1,12 @@
 # bloomctl Audit Trail Format
 
+> **Sharing caveat:** audit lines are tenant-identifying even though
+> they omit response bodies and tokens — they carry real path/query
+> parameter values, the tenant hostname inside pagination cursors,
+> local hostname/username, and CEL predicate text. Never paste raw
+> lines into issues, PRs, or commits; see SECURITY.md "Tenant Data
+> Hygiene".
+
 > Status: design (v1). Implementation lands with the SDK wire-up. The
 > schema below is the contract future code must honor; deviations require
 > bumping `schema_version`.

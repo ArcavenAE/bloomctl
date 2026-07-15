@@ -46,6 +46,8 @@ seed shapes for the v0.2 composite-verb question (charter F3).
 | `vulnerability` | severity enum + rank ordering, `*_date` timestamp promotion |
 | `audit_event` | `*_at` timestamp promotion, action search field |
 
-Field names are drawn from iru's API documentation and are provisional
-until live validation (charter F1/F2) — if a live payload disagrees,
-fix the fixture *and* the kind table together.
+**Fixtures are synthetic by policy.** Never regenerate them by copying
+live payloads — real serials, UDIDs, device names, and emails must not
+enter git (SECURITY.md "Tenant Data Hygiene"). If a live payload
+disagrees with a fixture's *shape*, synthesize new placeholder values
+that match the corrected shape, and fix the kind table together with it.
