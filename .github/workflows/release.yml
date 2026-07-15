@@ -218,6 +218,14 @@ jobs:
             --repo "${{ github.repository }}" \
             --title "v${VERSION}" \
             --generate-notes \
+            --notes "$(cat <<NOTES
+          Install via Homebrew:
+              brew install ArcavenAE/tap/bloomctl
+
+          Or with mise (pulls this exact release, verifies GitHub attestations natively):
+              mise use "github:ArcavenAE/bloomctl@${TAG}"
+          NOTES
+          )" \
             dist/*
 
   update-homebrew:

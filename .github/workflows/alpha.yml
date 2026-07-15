@@ -208,6 +208,13 @@ jobs:
 
           Install via Homebrew:
               brew install ArcavenAE/tap/bloomctl
+
+          Or with mise (pulls this exact release, verifies GitHub attestations natively):
+              mise use "github:ArcavenAE/bloomctl@${TAG}"
+
+          To track the alpha channel with mise, add to mise.toml:
+              [tools]
+              "github:ArcavenAE/bloomctl" = { version = "latest", prerelease = true }
           NOTES
           )" \
             dist/*
