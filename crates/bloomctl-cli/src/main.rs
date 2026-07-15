@@ -215,7 +215,7 @@ struct ListArgs {
                   (`device_id` for devices, `blueprint_id` for blueprints, `cve_id` for \
                   vulnerabilities, etc.).\n\n\
                   Examples:\n  \
-                  bloomctl get device 03c6a996-...-uuid\n  \
+                  bloomctl get device 7f9e2a10-1111-4a4a-9c1a-000000000001\n  \
                   bloomctl get vulnerability CVE-2026-1234")]
 struct GetArgs {
     /// Stream-contract `_kind` (must have a get-by-id endpoint).
