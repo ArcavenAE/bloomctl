@@ -13,8 +13,9 @@ jobs:
     name: Scorecard analysis
     # ossf/scorecard-action supports public repositories only; the guard
     # keeps this green while the repo is private and self-activates on
-    # visibility flip.
-    if: ${{ !github.event.repository.private }}
+    # visibility flip. Additionally default off — enable by setting repo
+    # variable SCORECARD_ENABLED=true (same opt-in pattern as SIGNING_ENABLED).
+    if: ${{ !github.event.repository.private && vars.SCORECARD_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write
