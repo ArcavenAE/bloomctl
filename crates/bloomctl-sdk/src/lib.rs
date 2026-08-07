@@ -31,3 +31,17 @@ pub use spec::{HttpMethod, OperationMeta, Registry, registry};
 pub use stream::{Record, SourceRef, read_stream, write_record};
 
 pub const SDK_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Channel/build identity stamped by `build.rs`: the CI channel tag
+/// (`BLOOMCTL_BUILD_ID` env), a local `dev+g<sha7>[-dirty]`, or
+/// `unknown`. Lets audit miners stratify by channel when every channel
+/// shares one Cargo version.
+pub const BUILD_ID: &str = env!("BLOOMCTL_BUILD_ID");
+
+/// `<semver> (<build_id>)` — the CLI's `--version` string.
+pub const FULL_VERSION: &str = concat!(
+    env!("CARGO_PKG_VERSION"),
+    " (",
+    env!("BLOOMCTL_BUILD_ID"),
+    ")"
+);

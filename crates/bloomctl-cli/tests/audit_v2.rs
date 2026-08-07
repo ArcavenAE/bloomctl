@@ -104,6 +104,43 @@ fn filter_emits_v2_verb_event_with_predicate_fields() {
 }
 
 #[test]
+fn invocation_carries_build_id() {
+    let dir = tempdir();
+
+    let mut cmd = Command::cargo_bin("bloomctl").expect("bloomctl");
+    cmd.args(["filter", "--where", r#"severity == "critical""#]);
+    cmd.env("BLOOMCTL_AUDIT_DIR", &dir);
+    cmd.env_remove("BLOOMCTL_API_TOKEN");
+    cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
+    let mut child = cmd.spawn().unwrap();
+    child
+        .stdin
+        .as_mut()
+        .unwrap()
+        .write_all(fixture("vulnerability").as_bytes())
+        .unwrap();
+    drop(child.stdin.take());
+    assert!(child.wait_with_output().unwrap().status.success());
+
+    let lines = read_audit_lines(&dir);
+    let invocation = &lines[0]["invocation"];
+
+    // binary_version alone cannot identify a build: every channel
+    // shares one Cargo version. build_id is what stratifies them.
+    let build_id = invocation["build_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("invocation.build_id missing: {invocation:?}"));
+    assert!(!build_id.is_empty());
+    assert_eq!(build_id, bloomctl_sdk::BUILD_ID);
+    assert_ne!(
+        build_id, invocation["binary_version"],
+        "build_id must not collapse to the Cargo version"
+    );
+
+    cleanup(&dir);
+}
+
+#[test]
 fn filter_ast_shape_is_value_independent() {
     // Two predicates with the same shape but different literals must
     // hash to the same predicate_ast_shape.

@@ -17,7 +17,7 @@ use serde_json::{Map, Value, json};
 #[derive(Parser, Debug)]
 #[command(
     name = "bloomctl",
-    version,
+    version = bloomctl_sdk::FULL_VERSION,
     about = "Rust CLI for the iru (Kandji) Endpoint Management API",
     long_about = "Agent-first CLI over the iru Endpoint Management API. Codegen from OpenAPI, \
                   audit-trail-as-feature, read-only by default against the live tenant.\n\n\

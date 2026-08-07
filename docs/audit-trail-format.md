@@ -50,6 +50,7 @@ optional.
   "invocation": {
     "argv": ["bloomctl", "list", "device", "--param", "limit=50"],
     "binary_version": "0.1.0",
+    "build_id": "alpha-20260807-013455-a1b2c3d",
     "host": "kinu",
     "user": "mike",
     "tty": false,
@@ -85,7 +86,8 @@ optional.
 | `ts_start` | RFC 3339 UTC timestamp of when the HTTP request was sent. |
 | `duration_ms` | Integer milliseconds, request-send to response-fully-read. |
 | `invocation.argv` | Full argv with secret values redacted (e.g. `--token=...` → `--token=***`). |
-| `invocation.binary_version` | `CARGO_PKG_VERSION` of the running bloomctl. |
+| `invocation.binary_version` | `CARGO_PKG_VERSION` of the running bloomctl. Every channel shares one Cargo version, so this alone does not identify a build. |
+| `invocation.build_id` | Which build actually ran. CI stamps the channel tag (`alpha-<utc>-<sha7>`, or `<v-tag>+g<sha7>` for a release); local builds get `dev+g<sha7>[-dirty]`; a source tarball with no git and no env gets `unknown`. This is the field to stratify by when mining across channels. |
 | `invocation.host` | `gethostname`. |
 | `invocation.user` | `$USER` (best-effort). |
 | `invocation.tty` | `true` if stdout is a tty. |
