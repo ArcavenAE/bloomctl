@@ -49,7 +49,7 @@ progenitor-client = "0.14"
 bytes = "1"
 
 # Misc utilities used in the SDK
-sha2 = "0.10"
+sha2 = "0.11"
 urlencoding = "2"
 
 # Predicate language for `bloomctl filter --where '<CEL>'`
