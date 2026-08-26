@@ -11,7 +11,21 @@ fn fixture(name: &str) -> String {
 }
 
 fn run_filter(input: &str, args: &[&str]) -> std::process::Output {
+    run_filter_inner(input, args, None)
+}
+
+/// Like `run_filter`, but pins the CLI's reference `now` (RFC3339) via
+/// `BLOOMCTL_NOW` so time-relative predicates are deterministic instead
+/// of racing the wall clock.
+fn run_filter_at(now: &str, input: &str, args: &[&str]) -> std::process::Output {
+    run_filter_inner(input, args, Some(now))
+}
+
+fn run_filter_inner(input: &str, args: &[&str], now: Option<&str>) -> std::process::Output {
     let mut cmd = Command::cargo_bin("bloomctl").expect("bloomctl binary");
+    if let Some(n) = now {
+        cmd.env("BLOOMCTL_NOW", n);
+    }
     cmd.arg("filter").args(args);
     cmd.stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -150,7 +164,11 @@ fn date_suffix_field_promotes_for_comparison_with_now() {
 fn last_check_in_promotes_for_comparison_with_now() {
     // Device staleness is the canonical iru fleet question: which
     // devices haven't checked in for N days?
-    let out = run_filter(
+    // Pin `now` so the fixtures' fixed dates give a stable result. With
+    // a live wall clock this test rots: 30 days after the July fixture
+    // dates, kestrel/skiff/rocinante also cross the staleness threshold.
+    let out = run_filter_at(
+        "2026-07-16T00:00:00Z",
         &fixture("device"),
         &["--where", r#"last_check_in < now - duration("720h")"#],
     );
@@ -161,8 +179,8 @@ fn last_check_in_promotes_for_comparison_with_now() {
     );
     let stdout = String::from_utf8(out.stdout).unwrap();
     let lines: Vec<&str> = stdout.lines().collect();
-    // Only osprey (2026-05-01) is more than 30 days stale relative to
-    // any plausible test-run date after 2026-07-15.
+    // With now = 2026-07-16, only osprey (2026-05-01) is >30 days stale;
+    // the other devices last checked in on 2026-07-14/15.
     assert_eq!(lines.len(), 1, "expected only osprey stale: {lines:?}");
     assert!(lines[0].contains("osprey"));
 }

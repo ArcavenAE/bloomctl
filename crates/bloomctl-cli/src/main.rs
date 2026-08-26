@@ -1626,6 +1626,18 @@ fn explain_filter(predicate: &str, program: &cel_interpreter::Program) -> anyhow
 }
 
 fn chrono_now() -> chrono::DateTime<chrono::Utc> {
+    // Determinism seam (cli-philosophy.md: "time is bound at call time").
+    // BLOOMCTL_NOW pins the reference `now` (RFC3339) so time-relative
+    // filters like `last_check_in < now - duration("720h")` are
+    // reproducible: same argv + same stdin + same config -> same stdout.
+    // Also serves as-of queries. A malformed value warns and falls back
+    // rather than silently substituting the wall clock.
+    if let Ok(s) = std::env::var("BLOOMCTL_NOW") {
+        match chrono::DateTime::parse_from_rfc3339(&s) {
+            Ok(dt) => return dt.with_timezone(&chrono::Utc),
+            Err(e) => eprintln!("bloomctl: ignoring malformed BLOOMCTL_NOW ({s:?}): {e}"),
+        }
+    }
     chrono::Utc::now()
 }
 
