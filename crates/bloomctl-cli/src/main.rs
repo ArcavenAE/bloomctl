@@ -1557,7 +1557,15 @@ fn predicate_ast_shape(program: &cel_interpreter::Program) -> String {
     let stripped = strip_literals(&debug);
     let mut hasher = Sha256::new();
     hasher.update(stripped.as_bytes());
-    format!("sha256:{:x}", hasher.finalize())
+    // sha2 0.11 returns a hybrid-array `Array`, which has no LowerHex impl;
+    // spell the digest out byte by byte, as audit.rs already does.
+    use std::fmt::Write;
+    let digest = hasher.finalize();
+    let mut hex = String::with_capacity(digest.len() * 2);
+    for b in digest.iter() {
+        write!(hex, "{b:02x}").expect("write to String");
+    }
+    format!("sha256:{hex}")
 }
 
 fn strip_literals(s: &str) -> String {
