@@ -58,8 +58,11 @@ director's read-only smoke test on the built v4 binary against bloomctl's own
 stored credential. bloomctl holds a different vendor credential than sidestep, so
 it is measured on its own. The agent does not touch the live vendor tenant.
 
-RESULT: pending the director's read-only read-back on the built v4 bloomctl
-binary. Update this line once measured.
+RESULT: transparent upgrade (measured 2026-09-18). The director ran a read-only
+`auth status` on the built v4 binary. It reported `source: keyring` (token length
+36 bytes; secret never surfaced). The v3-written Keychain entry reads back under
+v4 with no re-authentication and no macOS Keychain prompt. No upgrade note is
+needed.
 
 ## Linux caveat (recorded, not chased)
 
