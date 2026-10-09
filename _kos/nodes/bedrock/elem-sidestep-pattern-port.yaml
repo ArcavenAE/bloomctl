@@ -14,6 +14,10 @@ content: |
   Cross-repo evidence: orc finding-077 (pattern-vs-implementation
   split); bears on orc F16 (assumption provenance) and F17 (lifecycle
   infrastructure).
+
+  The keyring v3 to v4 move is a pattern replay of sidestep's reference
+  finding: `_kos/findings/finding-001-keyring-v3-to-v4-crate-split-replay.md`
+  (finding-001).
 edges:
   - target: elem-codegen-iru-prepasses
     type: supports
