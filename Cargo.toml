@@ -44,7 +44,7 @@ dirs = "7"
 keyring = "4"
 
 # Codegen runtime (progenitor's runtime crate, used by bloomctl-api)
-progenitor-client = "0.15"
+progenitor-client = "0.17"
 bytes = "1"
 
 # Misc utilities used in the SDK
